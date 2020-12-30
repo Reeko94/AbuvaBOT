@@ -11,13 +11,14 @@ const readdir = promisify(require("fs").readdir);
 const Enmap = require("enmap");
 const klaw = require("klaw");
 const path = require("path");
+const Db = require("./modules/Db");
 
 
 class GuideBot extends Client {
   constructor (options) {
     super(options);
 
-    
+
     // Here we load the config.js file that contains our token and our prefix values.
     this.config = require("./config.js");
     // client.config.token contains the bot's token
@@ -38,6 +39,9 @@ class GuideBot extends Client {
 
     // Basically just an async shortcut to using a setTimeout. Nothing fancy!
     this.wait = require("util").promisify(setTimeout);
+
+    // requiring DB Class to make differents queries
+    this.db = new Db(this);
   }
 
   /*
@@ -65,9 +69,9 @@ class GuideBot extends Client {
     return permlvl;
   }
 
-  /* 
+  /*
   COMMAND LOAD AND UNLOAD
-  
+
   To simplify the loading and unloading of commands from multiple locations
   including the index.js load loop, and the reload function, these 2 ensure
   that unloading happens in a consistent manner across the board.
@@ -245,7 +249,7 @@ client.on("disconnect", () => client.logger.warn("Bot is disconnecting..."))
 // this, a conflict also occurs. KNOWING THIS however, the following methods
 // are, we feel, very useful in code. So let's just Carpe Diem.
 
-// <String>.toPropercase() returns a proper-cased string such as: 
+// <String>.toPropercase() returns a proper-cased string such as:
 // "Mary had a little lamb".toProperCase() returns "Mary Had A Little Lamb"
 String.prototype.toProperCase = function () {
   return this.replace(/([^\W_]+[^\s-]*) */g, function (txt) {return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
@@ -260,7 +264,7 @@ Array.prototype.random = function () {
 process.on("uncaughtException", (err) => {
   const errorMsg = err.stack.replace(new RegExp(`${__dirname}/`, "g"), "./");
   console.error("Uncaught Exception: ", errorMsg);
-  // Always best practice to let the code crash on uncaught exceptions. 
+  // Always best practice to let the code crash on uncaught exceptions.
   // Because you should be catching them anyway.
   process.exit(1);
 });
