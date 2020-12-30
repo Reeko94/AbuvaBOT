@@ -14,7 +14,7 @@ class Time extends Command {
 
   async run (message, args, level) {
     await this.client.db.login("Telecaster");
-    const characters = await this.client.db.query("SELECT * FROM dbo.Character WHERE SUBSTRING(name,1,1) <> '@' AND SUBSTRING(name,1,7) <> '[ADMIN]' ORDER BY lv DESC");
+    const characters = await this.client.db.query("SELECT * FROM dbo.Character WHERE SUBSTRING(name,1,1) <> '@' AND SUBSTRING(name,1,7) <> '[ADMIN]' ORDER BY play_time DESC");
     await this.client.db.logout();
 
     const persons = await Promise.all(characters.recordset.map(async (c,index) => {
