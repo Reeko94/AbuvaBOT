@@ -22,19 +22,16 @@ class Rank extends Command {
     const persons = await Promise.all(
       characters.recordset.map(async (c, index) => {
         const actualLV = (c.lv);
-        const actualXP = parseInt(c.exp);
-        const nextLVLExp = rankPerLevel.recordset[actualLV - 1].exp;
-        /*
-            nextLVLExp  actualEXP
-            100%        ??
-        */
-        characters.recordset[index]["nextLevelPercentage"] = parseInt((100 * actualXP) / nextLVLExp);
         const jobID = c.job;
-        const jobResource = await this.client.db.query("select * from dbo.JobResource where id = " + jobID);
-        const text_id = jobResource.recordset[0].text_id;
-        const stringResource = await this.client.db.query("select * from dbo.StringResource where code = " + text_id);
-        characters.recordset[index]["job_name"] = stringResource.recordset[0].value;
-        return { name: "**" + c.name + "**", job: stringResource.recordset[0].value, level: actualLV + " (" + parseInt((100 * actualXP) / nextLVLExp) + "%)" };
+        let job = "Non renseigné";
+        if (jobID > 0) {
+          const jobResource = await this.client.db.query("select * from dbo.JobResource where id = " + jobID);
+          const text_id = jobResource.recordset[0].text_id;
+          const stringResource = await this.client.db.query("select * from dbo.StringResource where code = " + text_id);
+          characters.recordset[index]["job_name"] = stringResource.recordset[0].value;
+          job = stringResource.recordset[0].value;
+        }
+        return { name: "**" + c.name + "**", job: job, level: actualLV,play_time: c.play_time };
       }));
 
     const levels = persons.map(p => {
@@ -53,11 +50,10 @@ class Rank extends Command {
       .setTitle("Classement des joueurs")
       .setURL("https://discord.js.org/")
       .setAuthor("AbhuvaBOT", "https://i.imgur.com/wSTFkRM.png", "https://discord.js.org")
-      .setThumbnail("https://i.imgur.com/wSTFkRM.png")
       .addFields(
         { name: "Joueurs", value: players, inline: true },
         { name: "Classe", value: classes, inline: true },
-        { name: "Niveau (%)", value: levels, inline: true },
+        { name: "Niveau", value: levels, inline: true }
       );
 
 
