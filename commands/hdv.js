@@ -31,7 +31,7 @@ class Hdv extends Command {
       channelHDV.send("**___Hotel des ventes___**");
       let messageHDV = "";
       itemsInHDV.recordset.map(item => {
-        var duration = moment(itemsInHDV.recordset[0].end_time).diff(moment());
+        var duration = moment(item.end_time).diff(moment());
         var timeBeforeEnd = moment.duration(duration);
         messageHDV += `__${item.seller_name}__ >> __**${item.value}**__  >> ** ${item.highest_bidding_price} ** (**${item.instant_purchase_price}**)  >>  __***${timeBeforeEnd.format("hh:mm:ss")} Restant***__ \n `;
       });
