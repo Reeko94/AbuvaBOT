@@ -1,3 +1,7 @@
+const nodeCron = require("node-cron");
+const { promisify } = require("util");
+const readdir = promisify(require("fs").readdir);
+
 module.exports = class {
   constructor (client) {
     this.client = client;
@@ -29,6 +33,18 @@ module.exports = class {
     // Set the game as the default help command + guild count.
     // NOTE: This is also set in the guildCreate and guildDelete events!
     await this.client.user.setActivity(`${this.client.settings.get("default").prefix}help | ${this.client.guilds.cache.size} Servers`);
+
+
+    const tasksFiles = await readdir("./tasks/");
+    this.client.logger.log(`Loading a total of ${tasksFiles.length} tasks`,"log");
+    tasksFiles.forEach(file => {
+      const taskName = file.split(".")[0];
+      this.client.logger.log(`Loading Task: ${taskName}`);
+      this.client.guilds.cache.map(guild => {
+        const task = new (require(`../tasks/${file}`))(this.client);
+        nodeCron.schedule(task.scheduler,() => task.run(guild));
+      });
+    });
 
     // Log that we're ready to serve, so we know the bot accepts commands.
     this.client.logger.log(`${this.client.user.tag}, ready to serve ${this.client.users.cache.size} users in ${this.client.guilds.cache.size} servers.`, "ready");

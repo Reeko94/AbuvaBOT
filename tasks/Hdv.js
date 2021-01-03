@@ -1,21 +1,13 @@
-const Command = require("../base/Command");
+const Cron = require("../base/Cron");
 const moment = require("moment");
-const momentDurationFormatSetup = require("moment-duration-format");
 
-class Hdv extends Command {
+class Hdv extends Cron {
   constructor (client) {
-    super(client, {
-      name: "hdv",
-      description: "Voir l'hotel de vente",
-      usage: "hdv",
-      guildOnly: true,
-      aliases: ["hvd","dhv"],
-      permLevel: ["Bot Owner","Developer"]
-    });
+    super(client, "*/10 * * * *");
   }
 
-  async run (message, args, level) {
-    const channelHDV = message.guild.channels.cache.find(channel => channel.name === "hdv");
+  async run (guild) {
+    const channelHDV = guild.channels.cache.find(channel => channel.name === "hdv");
     await this.client.db.login("Telecaster");
     const itemsInHDV = await this.client.db.query("select *\n" +
       "from Telecaster.dbo.Auction hdv\n" +
@@ -47,8 +39,6 @@ class Hdv extends Command {
         }
       });
       channelHDV.send(messageReadyToSend);
-    } else {
-      message.reply("Aucun item dans l'hotel des ventes. Désolé");
     }
   }
 }
