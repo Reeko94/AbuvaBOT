@@ -1,4 +1,6 @@
 const Command = require("../base/Command");
+const moment = require("moment");
+const momentDurationFormatSetup = require("moment-duration-format");
 
 class Hdv extends Command {
   constructor (client) {
@@ -29,7 +31,9 @@ class Hdv extends Command {
       channelHDV.send("**___Hotel des ventes___**");
       let messageHDV = "";
       itemsInHDV.recordset.map(item => {
-        messageHDV += `__${item.seller_name}__ >> __**${item.value}**__  >> ** ${item.highest_bidding_price} ** (**${item.instant_purchase_price}**)  >>  __***15:15:15 Restant***__ \n `;
+        var duration = moment(itemsInHDV.recordset[0].end_time).diff(moment());
+        var timeBeforeEnd = moment.duration(duration);
+        messageHDV += `__${item.seller_name}__ >> __**${item.value}**__  >> ** ${item.highest_bidding_price} ** (**${item.instant_purchase_price}**)  >>  __***${timeBeforeEnd.format("hh:mm:ss")} Restant***__ \n `;
       });
       const messages = messageHDV.replace(/^\s+|\s+$/g, "").split("\n");
       messages.splice(-1);
