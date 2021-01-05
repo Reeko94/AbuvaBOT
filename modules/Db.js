@@ -34,6 +34,21 @@ class Db {
     }
   }
 
+  async insert (db, table, datas = {}) {
+    this.login(db).then(() => {
+      const request = this.dbo.request();
+      const keys = Object.keys(datas);
+      const values = Object.values(datas);
+
+      keys.map((k,i) => {
+        request.input(k, values[i]);
+      });
+      console.log(`INSERT INTO ${table} (${keys.join(",")}) values (@${keys.join(",@")})`);
+      return request.query(`INSERT INTO ${table} (${keys.join(",")}) values (@${keys.join(",@")})`);
+    });
+    await this.logout();
+  }
+
   async logout () {
     await this.dbo.close();
   }
