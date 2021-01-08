@@ -7,7 +7,7 @@ class Online extends Command {
       name:"online",
       description: "Recupération des joueurs en ligne",
       usage: "online",
-      permLevel: "Bot Owner"
+      permLevel: ["Bot Owner", "Developer"]
     });
   }
 
