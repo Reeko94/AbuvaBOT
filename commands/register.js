@@ -15,7 +15,7 @@ class Register extends Command {
     if (message.guild) return message.reply("Cette commande ne s'execute qu'en message privée");
     await this.client.db.login("discord_data");
     const user = await this.client.db.query(`SELECT COUNT(id) FROM discord_data.dbo.register_users WHERE discord_tag = '${message.author.tag}'`);
-    if (user.recordset.length === 1) return message.reply("Un compte exist déjà avec votre pseudo");
+    if (user.recordset[0][0] === 1) return message.reply("Un compte exist déjà avec votre pseudo");
     const questionList = ["Quelle est votre adresse e-mail ?", "Merci de choisir un nom d'utilisateur pour vous connecter","Choisir un mot de passe (**8 caracteres minimum, majuscule, minuscule et au moins un chiffre**)"];
     const responseList = await questionList.reduce(
       async (previousQuestions, currentQuestion, index) => {
